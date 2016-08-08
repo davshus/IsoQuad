@@ -1,5 +1,5 @@
 <h1>NOTE</h1>
-This project is currently undergoing a COMPLETE REWRITE because I had no clue what I was doing the first time.<br>
+This project is currently undergoing a <b>COMPLETE REWRITE</b> because I had no clue what I was doing the first time.<br>
 My memory leaked more than a 10 year old faucet in a public bathroom.<br>
 Don't do malloc(), kids.<br>
 # IsoQuad

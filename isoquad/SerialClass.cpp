@@ -22,12 +22,12 @@ Serial::Serial(char *portName)
 		if (GetLastError() == ERROR_FILE_NOT_FOUND) {
 
 			//Print Error if neccessary
-			cout << "ERROR: Handle was not attached. Reason: " << portName << "not available.\n" << endl;
+			cout << "ERROR: Handle was not attached. Reason: " << portName << " not available.\n" << endl;
 
 		}
 		else
 		{
-			cout << "ERROR!!!" << endl;
+			cout << "ERROR: Unknown" << endl;
 		}
 	}
 	else

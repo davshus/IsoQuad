@@ -10,7 +10,7 @@ Works via COM Connections.  Uses <a href="http://playground.arduino.cc/Interfaci
 
 To Do:
 - [x] Secondary incoming COM connection
-~~- [ ] Unlimited quantity of incoming and outgoing COM connections.~~
+- [ ] ~~Unlimited quantity of incoming and outgoing COM connections.~~
 - [x] Separate function for connecting to Serial Ports
 - [x] Optimization
 - [x] Removing comments

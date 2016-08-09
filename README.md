@@ -1,7 +1,3 @@
-<h1>NOTE</h1>
-This project is currently undergoing a <b>COMPLETE REWRITE</b> because I had no clue what I was doing the first time.<br>
-My memory leaked more than a 10 year old faucet in a public bathroom.<br>
-Don't do malloc(), kids.<br>
 # IsoQuad
 A remote control for a quadcopter, written in C++ by David Shustin, 2016
 <br>
@@ -14,7 +10,8 @@ Works via COM Connections.  Uses <a href="http://playground.arduino.cc/Interfaci
 
 To Do:
 - [x] Secondary incoming COM connection
-- [ ] Unlimited quantity of incoming and outgoing COM connections.
-- [ ] Separate function for connecting to Serial Ports
-- [ ] Optimization
-- [ ] Removing comments
+~~- [ ] Unlimited quantity of incoming and outgoing COM connections.~~
+- [x] Separate function for connecting to Serial Ports
+- [x] Optimization
+- [x] Removing comments
+- [x] Full Rewrite

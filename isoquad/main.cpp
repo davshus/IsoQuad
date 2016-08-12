@@ -2,8 +2,11 @@
 #include "SerialClass.h"
 #include <stdio.h>
 #include <string>
+#include <conio.h>
+#include <iostream>
 #define ARGUMENT_USAGE "\n\nERROR: Incorrect Argument Usage\n\nCorrect Usage: isoquad <Output COM> [Input COM]\n"
 #define PRINT_ARG_USAGE printf(ARGUMENT_USAGE)
+#define PAUSE printf("\nPress any key to continue...\n"); getch()
 using namespace std;
 bool COMConnect(char *arg, Serial **SP) {
 	char *COMPort = new char[strlen(arg) + 1];
@@ -35,7 +38,7 @@ bool COMConnect(char *arg, Serial **SP) {
 	else
 		return false;
 	delete[] COMPort;
-	system("pause");
+	//PAUSE;
 	printf("\n\n");
 	return true;
 }
@@ -46,12 +49,36 @@ int main(int argc, char *argv[]) {
 		PRINT_ARG_USAGE;
 		return 0;
 	}
-	if (!COMConnect(argv[1], &SPO))
+	if (!COMConnect(argv[1], &SPO)) {
+		PAUSE;
 		return 0;
-	if (argc > 2) {
-		if (!COMConnect(argv[2], &SPI))
-			return 0;
 	}
+	if (argc > 2) {
+		if (!COMConnect(argv[2], &SPI)) {
+			PAUSE;
+			return 0;
+		}
+	}
+	printf("Ready to start transmitting data!");
+	PAUSE;
+	printf("Press Escape to exit...\n");
+	int key;
+	do {
+		key = 0;
+		if (kbhit())
+			key = getch();
+		switch (key) {
+		case 59:
+			printf("F1 detected.\n");
+			break;
+		case 60:
+			printf("F2 detected.\n");
+			break;
+		case (int)'w':
+			printf("w detected.\n");
+			break;
+		}
+	} while (key != 27);
 	delete SPO;
 	delete SPI;
 	return 0;

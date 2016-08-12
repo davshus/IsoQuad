@@ -27,7 +27,7 @@ Serial::Serial(char *portName)
 		}
 		else
 		{
-			cout << "ERROR: Unknown" << endl;
+			cout << "ERROR: Unknown. (Are you sure " << portName << " is functional?)" << endl;
 		}
 	}
 	else

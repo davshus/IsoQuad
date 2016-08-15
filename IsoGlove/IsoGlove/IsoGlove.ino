@@ -82,12 +82,12 @@ MPU6050 mpu;
 
 //uncomment "OUTPUT_READABLE_QUATERNION_ISOQUAD" if you want to use
 //quaternion components with "IsoQuad.exe".
-//#define OUTPUT_READABLE_QUATERNION_ISOQUAD
+#define OUTPUT_READABLE_QUATERNION_ISOQUAD
 
 // uncomment "OUTPUT_READABLE_QUATERNION" if you want to see the actual
 // quaternion components in a [w, x, y, z] format (not best for parsing
 // on a remote host such as Processing or something though)
-#define OUTPUT_READABLE_QUATERNION
+//#define OUTPUT_READABLE_QUATERNION
 
 // uncomment "OUTPUT_READABLE_EULER" if you want to see Euler angles
 // (in degrees) calculated from the quaternions coming from the FIFO.

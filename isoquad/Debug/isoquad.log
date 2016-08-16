@@ -1,3 +1,7 @@
 ﻿  main.cpp
+c:\users\david shustin\desktop\projects\isoquad\isoquad\main.cpp(113): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+c:\users\david shustin\desktop\projects\isoquad\isoquad\main.cpp(116): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+c:\users\david shustin\desktop\projects\isoquad\isoquad\main.cpp(119): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+c:\users\david shustin\desktop\projects\isoquad\isoquad\main.cpp(122): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
   isoquad.vcxproj -> C:\Users\David Shustin\Desktop\Projects\IsoQuad\Debug\isoquad.exe
   isoquad.vcxproj -> C:\Users\David Shustin\Desktop\Projects\IsoQuad\Debug\isoquad.pdb (Partial PDB)

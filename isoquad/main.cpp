@@ -66,17 +66,16 @@ int main(int argc, char *argv[]) {
 	printf("Ready to start transmitting data!");
 	PAUSE;
 	printf("Press Escape to exit...\n");
-	binaryFloat qw, qx, qy, qz;
-	qw.floatingPoint, qx.floatingPoint, qy.floatingPoint, qz.floatingPoint = 0.0;
-	bool floatsReady = false; //safeguard against using floats before they are defined
+	float qw, qx, qy, qz = 0.0;
 	int key; //keyboard command
 	char buffer[1024]; //input buffer
-	char FlTemp[4]; //float buffer
+	char FlTemp[6]; //float buffer
 	int index = 0; //bookmark for FlTemp
 	memset(buffer, '\0', 1024); //initialize input buffer
-	memset(FlTemp, '\0', 4); //initialize float buffer
+	memset(FlTemp, '\0', 6); //initialize float buffer
 	SPO->WriteData("l", 1); //begin transmission
 	bool ready = false; //safeguard against split buffer
+	bool modeSwitch = false;
 	char mode; //current float
 	do {
 		key = 0;
@@ -108,42 +107,28 @@ int main(int argc, char *argv[]) {
 					if (ready)
 						mode = *cp;
 					break;
-				case 'a':
-					if (ready)
-						cout << "Quaternion - \t" << qw.floatingPoint << "\t" << qx.floatingPoint << "\t" << qy.floatingPoint << "\t" << qz.floatingPoint << endl;
-					ready = false;
-					break;
+				case 'b':
+					switch (mode) {
+					case 'w':
+						qw = atof(FlTemp);
+						break;
+					case 'x':
+						qx = atof(FlTemp);
+						break;
+					case 'y':
+						qy = atof(FlTemp);
+						break;
+					case 'z':
+						qz = atof(FlTemp);
+						//Flush data
+						cout << "Quaternion:\t" << qw << "\t" << qx << "\t" << qy << "\t" << qz << "\t";
+						break;
+					}
 				default: 
 					if (ready) {
-						if (index == 4) {
-							//Flush data
-							index = 0;
-							switch (mode) {
-							case 'w':
-								for (int i = 0; i < 4; i++) {
-									qw.binary[i] = FlTemp[i];
-								}
-								break;
-							case 'x':
-								for (int i = 0; i < 4; i++) {
-									qx.binary[i] = FlTemp[i];
-								}
-								break;
-							case 'y':
-								for (int i = 0; i < 4; i++) {
-									qy.binary[i] = FlTemp[i];
-								}
-								break;
-							case 'z':
-								for (int i = 0; i < 4; i++) {
-									qz.binary[i] = FlTemp[i];
-								}
-								break;
-							}
-						}
-						else {
-							FlTemp[index] = *cp;
-						}
+						char *cp2 = FlTemp;
+						while (*cp2) ++cp2;
+						*cp2 = *cp;
 					}
 					break;
 				}

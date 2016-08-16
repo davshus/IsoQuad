@@ -7,6 +7,10 @@
 #define ARGUMENT_USAGE "\n\nERROR: Incorrect Argument Usage\n\nCorrect Usage: isoquad <Output COM> [Input COM]\n"
 #define PRINT_ARG_USAGE printf(ARGUMENT_USAGE)
 #define PAUSE printf("\nPress any key to continue...\n"); getch()
+typedef union {
+	float floatingPoint;
+	char binary[4];
+} binaryFloat;
 using namespace std;
 bool COMConnect(char *arg, Serial **SP) {
 	char *COMPort = new char[strlen(arg) + 1];
@@ -62,12 +66,23 @@ int main(int argc, char *argv[]) {
 	printf("Ready to start transmitting data!");
 	PAUSE;
 	printf("Press Escape to exit...\n");
-	int key;
+	binaryFloat qw, qx, qy, qz;
+	qw.floatingPoint, qx.floatingPoint, qy.floatingPoint, qz.floatingPoint = 0.0;
+	bool floatsReady = false; //safeguard against using floats before they are defined
+	int key; //keyboard command
+	char buffer[1024]; //input buffer
+	char FlTemp[4]; //float buffer
+	int index = 0; //bookmark for FlTemp
+	memset(buffer, '\0', 1024); //initialize input buffer
+	memset(FlTemp, '\0', 4); //initialize float buffer
+	SPO->WriteData("l", 1); //begin transmission
+	bool ready = false; //safeguard against split buffer
+	char mode; //current float
 	do {
 		key = 0;
 		if (kbhit())
 			key = getch();
-		switch (key) {
+		/*switch (key) {
 		case 59:
 			printf("F1 detected.\n");
 			break;
@@ -77,7 +92,64 @@ int main(int argc, char *argv[]) {
 		case (int)'w':
 			printf("w detected.\n");
 			break;
+		}*/
+		//Parse through glove input
+		//TODO: Remove outdated data if program hangs, wait for current data
+		if (SPO->ReadData(buffer, 1023)) {
+			for (char *cp = buffer; *cp; ++cp) {
+				switch (*cp) {
+				case 'n':
+					ready = true;
+					break;
+				case 'w':
+				case 'x':
+				case 'y':
+				case 'z':
+					if (ready)
+						mode = *cp;
+					break;
+				case 'a':
+					if (ready)
+						cout << "Quaternion - \t" << qw.floatingPoint << "\t" << qx.floatingPoint << "\t" << qy.floatingPoint << "\t" << qz.floatingPoint << endl;
+					ready = false;
+					break;
+				default: 
+					if (ready) {
+						if (index == 4) {
+							//Flush data
+							index = 0;
+							switch (mode) {
+							case 'w':
+								for (int i = 0; i < 4; i++) {
+									qw.binary[i] = FlTemp[i];
+								}
+								break;
+							case 'x':
+								for (int i = 0; i < 4; i++) {
+									qx.binary[i] = FlTemp[i];
+								}
+								break;
+							case 'y':
+								for (int i = 0; i < 4; i++) {
+									qy.binary[i] = FlTemp[i];
+								}
+								break;
+							case 'z':
+								for (int i = 0; i < 4; i++) {
+									qz.binary[i] = FlTemp[i];
+								}
+								break;
+							}
+						}
+						else {
+							FlTemp[index] = *cp;
+						}
+					}
+					break;
+				}
+			}
 		}
+		memset(buffer, '\0', 1024);
 	} while (key != 27);
 	delete SPO;
 	delete SPI;

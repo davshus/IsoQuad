@@ -300,20 +300,15 @@ void loop() {
         #ifdef OUTPUT_READABLE_QUATERNION_ISOQUAD
           mpu.dmpGetQuaternion(&q, fifoBuffer);
           //Serial.write("n");
-
-          W.floatingPoint = q.w;
-          X.floatingPoint = q.x;
-          Y.floatingPoint = q.y;
-          Z.floatingPoint = q.z;
-          Serial.write('w');
-          Serial.write(W.binary, 4);
-          Serial.write('x');
-          Serial.write(X.binary, 4);
-          Serial.write('y');
-          Serial.write(Y.binary, 4);
-          Serial.write('z');
-          Serial.write(Z.binary, 4);
-          Serial.write('\n');
+          Serial.print('n');
+          Serial.print('w');
+          Serial.print(q.w);
+          Serial.print('x');
+          Serial.print(q.x);
+          Serial.print('y');
+          Serial.print(q.y);
+          Serial.print('z');
+          Serial.print(q.z);
         #endif
         
         #ifdef OUTPUT_READABLE_QUATERNION

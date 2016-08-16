@@ -7,10 +7,7 @@
 #define ARGUMENT_USAGE "\n\nERROR: Incorrect Argument Usage\n\nCorrect Usage: isoquad <Output COM> [Input COM]\n"
 #define PRINT_ARG_USAGE printf(ARGUMENT_USAGE)
 #define PAUSE printf("\nPress any key to continue...\n"); getch()
-typedef union {
-	float floatingPoint;
-	char binary[4];
-} binaryFloat;
+typedef float quaternion[4];
 using namespace std;
 bool COMConnect(char *arg, Serial **SP) {
 	char *COMPort = new char[strlen(arg) + 1];
@@ -66,17 +63,14 @@ int main(int argc, char *argv[]) {
 	printf("Ready to start transmitting data!");
 	PAUSE;
 	printf("Press Escape to exit...\n");
-	float qw, qx, qy, qz = 0.0;
 	int key; //keyboard command
 	char buffer[1024]; //input buffer
-	char FlTemp[6]; //float buffer
-	int index = 0; //bookmark for FlTemp
 	memset(buffer, '\0', 1024); //initialize input buffer
-	memset(FlTemp, '\0', 6); //initialize float buffer
 	SPO->WriteData("l", 1); //begin transmission
-	bool ready = false; //safeguard against split buffer
-	bool modeSwitch = false;
-	char mode; //current float
+	int synced = 0;
+	int serialCount = 0;
+	char teapotPacket[14];
+	quaternion q;
 	do {
 		key = 0;
 		if (kbhit())
@@ -93,44 +87,31 @@ int main(int argc, char *argv[]) {
 			break;
 		}*/
 		//Parse through glove input
-		//TODO: Remove outdated data if program hangs, wait for current data
 		if (SPO->ReadData(buffer, 1023)) {
 			for (char *cp = buffer; *cp; ++cp) {
-				switch (*cp) {
-				case 'n':
-					ready = true;
-					break;
-				case 'w':
-				case 'x':
-				case 'y':
-				case 'z':
-					if (ready)
-						mode = *cp;
-					break;
-				case 'b':
-					switch (mode) {
-					case 'w':
-						qw = atof(FlTemp);
-						break;
-					case 'x':
-						qx = atof(FlTemp);
-						break;
-					case 'y':
-						qy = atof(FlTemp);
-						break;
-					case 'z':
-						qz = atof(FlTemp);
-						//Flush data
-						cout << "Quaternion:\t" << qw << "\t" << qx << "\t" << qy << "\t" << qz << "\t";
-						break;
+				//Credit to Jeff Rowberg for writing the original Java/Processing code that the following code is ported from.
+				//https://github.com/jrowberg/i2cdevlib/blob/master/Arduino/MPU6050/examples/MPU6050_DMP6/Processing/MPUTeapot/MPUTeapot.pde
+				int ch = (int)*cp;
+				if (synced == 0 && ch != '$') continue;
+				synced = 1;
+				if ((serialCount == 1 && ch != 0x02)
+					|| (serialCount == 12 && ch != '\r')
+					|| (serialCount == 13 && ch != '\n')) {
+					serialCount = 0;
+					synced = 0;
+					continue;
+				}
+				if (serialCount > 0 || ch == '$') {
+					teapotPacket[serialCount++] = (char)ch;
+					if (serialCount == 14) {
+						serialCount = 0;
+						q[0] = ((teapotPacket[2] << 8) | teapotPacket[3]) / 16384.0f;
+						q[1] = ((teapotPacket[4] << 8) | teapotPacket[5]) / 16384.0f;
+						q[2] = ((teapotPacket[6] << 8) | teapotPacket[7]) / 16384.0f;
+						q[3] = ((teapotPacket[8] << 8) | teapotPacket[9]) / 16384.0f;
+						for (int i = 0; i < 4; i++) if (q[i] >= 2) q[i] = -4 + q[i];
+						cout << "Quaternion:\t" << q[0] << "\t" << q[1] << "\t" << q[2] << "\t" << q[3] << endl;
 					}
-				default: 
-					if (ready) {
-						char *cp2 = FlTemp;
-						while (*cp2) ++cp2;
-						*cp2 = *cp;
-					}
-					break;
 				}
 			}
 		}

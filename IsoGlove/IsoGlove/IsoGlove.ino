@@ -82,7 +82,7 @@ MPU6050 mpu;
 
 //uncomment "OUTPUT_READABLE_QUATERNION_ISOQUAD" if you want to use
 //quaternion components with "IsoQuad.exe".
-#define OUTPUT_READABLE_QUATERNION_ISOQUAD
+//#define OUTPUT_READABLE_QUATERNION_ISOQUAD
 
 // uncomment "OUTPUT_READABLE_QUATERNION" if you want to see the actual
 // quaternion components in a [w, x, y, z] format (not best for parsing
@@ -117,7 +117,7 @@ MPU6050 mpu;
 
 // uncomment "OUTPUT_TEAPOT" if you want output that matches the
 // format used for the InvenSense teapot demo
-//#define OUTPUT_TEAPOT
+#define OUTPUT_TEAPOT
 
 
 
@@ -156,17 +156,7 @@ void dmpDataReady() {
     mpuInterrupt = true;
 }
 
-// ================================================================
-// ===                    FLOAT TRANSMISSION                    ===
-// ================================================================
-typedef union {
- float floatingPoint;
- byte binary[4];
-} binaryFloat;
-binaryFloat W;
-binaryFloat X;
-binaryFloat Y;
-binaryFloat Z;
+
 // ================================================================
 // ===                      INITIAL SETUP                       ===
 // ================================================================
@@ -296,20 +286,6 @@ void loop() {
         // track FIFO count here in case there is > 1 packet available
         // (this lets us immediately read more without waiting for an interrupt)
         fifoCount -= packetSize;
-
-        #ifdef OUTPUT_READABLE_QUATERNION_ISOQUAD
-          mpu.dmpGetQuaternion(&q, fifoBuffer);
-          //Serial.write("n");
-          Serial.print('n');
-          Serial.print('w');
-          Serial.print(q.w);
-          Serial.print('x');
-          Serial.print(q.x);
-          Serial.print('y');
-          Serial.print(q.y);
-          Serial.print('z');
-          Serial.print(q.z);
-        #endif
         
         #ifdef OUTPUT_READABLE_QUATERNION
             // display quaternion values in easy matrix form: w x y z
@@ -389,7 +365,10 @@ void loop() {
             teapotPacket[7] = fifoBuffer[9];
             teapotPacket[8] = fifoBuffer[12];
             teapotPacket[9] = fifoBuffer[13];
-            Serial.write(teapotPacket, 14);
+            //Serial.write(teapotPacket, 14);
+            for (int i = 0; i < 14; ++i) {
+              Serial.print(teapotPacket[i]);
+            }
             teapotPacket[11]++; // packetCount, loops at 0xFF on purpose
         #endif
 

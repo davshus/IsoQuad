@@ -1,72 +1,78 @@
 #pragma warning(disable:4996)
-#include "SerialClass.h"
 #include <stdio.h>
 #include <string>
 #include <conio.h>
 #include <iostream>
-#define ARGUMENT_USAGE "\n\nERROR: Incorrect Argument Usage\n\nCorrect Usage: isoquad <Output COM> [Input COM]\n"
-#define PRINT_ARG_USAGE printf(ARGUMENT_USAGE)
-#define PAUSE printf("\nPress any key to continue...\n"); getch()
+#include <serial.h>
 typedef float quaternion[4];
+#define	EXIT pause(); return 0
 using namespace std;
-bool COMConnect(char *arg, Serial **SP) {
-	char *COMPort = new char[strlen(arg) + 1];
-	for (unsigned int i = 0; i < strlen(arg) + 1; ++i) {
-		COMPort[i] = arg[i];
-	}
-	///////////////////////////////////////////////////////////
-	//The next two functions are separate because the program//
-	//should check if it is attempting to access a value that//
-	//   is not within the array.  Just trust me. I think.   //
-	///////////////////////////////////////////////////////////
-	printf("Verifying COM Port...\n");
-	if (strlen(COMPort) < 4) {
-		printf("\n%s is not a valid COM Port.\n", COMPort);
-		PRINT_ARG_USAGE;
-		return 0;
-	}
-	if (!(COMPort[0] == 'C' && COMPort[1] == 'O' && COMPort[2] == 'M') || atoi(COMPort + 3) == 0) {
-		printf("\n%s is not a valid COM Port.\n", COMPort);
-		PRINT_ARG_USAGE;
-		return 0;
-	}
-	printf("Verified!\nFormatting COM request...\n");
-	string COMFinal = atoi(COMPort + 3) > 9 ? "\\\\.\\" + string(COMPort) : string(COMPort);
-	printf("Formatting complete. %s was converted to %s (No change may have occured.  This is normal.)\n", COMPort, COMFinal.c_str());
-	*SP = new Serial(const_cast<char*>(COMFinal.c_str()));
-	if ((*SP)->IsConnected())
-		printf("Connected to COM Port %s!\n", COMFinal.c_str());
-	else
-		return false;
-	delete[] COMPort;
-	//PAUSE;
-	printf("\n\n");
-	return true;
+void pause() {
+	printf("Press any key to continue.");
+	_getch();
+	printf("\n");
 }
-Serial *SPO, *SPI = NULL;
+void printArgUsage(char* arg0) {
+	printf("Incorrect argument usage!\n Correct usage: %s <port> <baud rate>\n", arg0);
+}
+serial::Serial* connect(char *cport, char *cbaud = "9600") {
+	string port(cport);
+	string sbaud(cbaud);
+	//Validate baud
+	int baud;
+	try {
+		baud = stoi(sbaud);
+	}
+	catch (out_of_range) {
+		throw out_of_range("Baud rate is out of range.");
+	}
+	catch (invalid_argument) {
+		throw invalid_argument("Baud rate is not a number.");
+	}
+	if (baud < 0) {
+		throw out_of_range("Baud rate is a negative number.");
+	}
+	try {
+		serial::Serial *thisSerial = new serial::Serial(port, baud, serial::Timeout(1000));
+		return thisSerial;
+	}
+	catch (const exception& e) {
+		printf("There was a problem creating a Serial connection.\n");
+		throw exception(e.what());
+	}
+}
 int main(int argc, char *argv[]) {
 	printf("\n@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n####### ISOTONIC QUADCOPTER #######\n#######    PROGRAMMED BY    #######\n####### DAVID SHUSTIN, 2016 #######\n@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n\n");
-	if (argc > 3) {
-		PRINT_ARG_USAGE;
-		return 0;
+	if (argc < 2 || argc > 3) {
+		printArgUsage(argv[0]);
+		EXIT;
 	}
-	if (!COMConnect(argv[1], &SPO)) {
-		PAUSE;
-		return 0;
+	serial::Serial *SPO;
+	if (argc == 2) {
+		try {
+			SPO = connect(argv[1]);
+		}
+		catch (const exception& e) {
+			cout << e.what() << endl;
+			EXIT;
+		}
 	}
-	if (argc > 2) {
-		if (!COMConnect(argv[2], &SPI)) {
-			PAUSE;
-			return 0;
+	else {
+		try {
+			SPO = connect(argv[1], argv[2]);
+		}
+		catch (const exception& e) {
+			cout << e.what() << endl;
+			EXIT;
 		}
 	}
 	printf("Ready to start transmitting data!");
-	PAUSE;
+	pause();
 	printf("Press Escape to exit...\n");
 	int key; //keyboard command
-	char buffer[1024]; //input buffer
-	memset(buffer, '\0', 1024); //initialize input buffer
-	SPO->WriteData("l", 1); //begin transmission
+	uint8_t buf[1];
+	char ch;
+	SPO->write("l"); //begin transmission
 	int synced = 0;
 	int serialCount = 0;
 	char teapotPacket[14];
@@ -87,11 +93,11 @@ int main(int argc, char *argv[]) {
 			break;
 		}*/
 		//Parse through glove input
-		if (SPO->ReadData(buffer, 1023)) {
-			for (char *cp = buffer; *cp; ++cp) {
-				//Credit to Jeff Rowberg for writing the original Java/Processing code that the following code is ported from.
-				//https://github.com/jrowberg/i2cdevlib/blob/master/Arduino/MPU6050/examples/MPU6050_DMP6/Processing/MPUTeapot/MPUTeapot.pde
-				int ch = (int)*cp;
+		while (SPO->available()) {
+			//Credit to Jeff Rowberg for writing the original Java/Processing code that the following code is ported from.
+			//https://github.com/jrowberg/i2cdevlib/blob/master/Arduino/MPU6050/examples/MPU6050_DMP6/Processing/MPUTeapot/MPUTeapot.pde
+			if (SPO->read(buf, 1)) {
+				ch = (char)buf[0];
 				if (synced == 0 && ch != '$') continue;
 				synced = 1;
 				if ((serialCount == 1 && ch != 0x02)
@@ -110,14 +116,15 @@ int main(int argc, char *argv[]) {
 						q[2] = ((teapotPacket[6] << 8) | teapotPacket[7]) / 16384.0f;
 						q[3] = ((teapotPacket[8] << 8) | teapotPacket[9]) / 16384.0f;
 						for (int i = 0; i < 4; i++) if (q[i] >= 2) q[i] = -4 + q[i];
-						cout << "Quaternion:\t" << q[0] << "\t" << q[1] << "\t" << q[2] << "\t" << q[3] << endl;
+						cout << "Quaternion:\t" << q[0] << "\t" << q[1] << "\t" << q[2] << "\t" << q[3] << "\n";
 					}
 				}
 			}
 		}
-		memset(buffer, '\0', 1024);
+		//memset(buffer, '\0', 1024);
 	} while (key != 27);
+	if (SPO->isOpen())
+		SPO->close();
 	delete SPO;
-	delete SPI;
-	return 0;
+	EXIT;
 }

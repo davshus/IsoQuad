@@ -15,7 +15,7 @@ void pause() {
 void printArgUsage(char* arg0) {
 	printf("Incorrect argument usage!\n Correct usage: %s <port> <baud rate>\n", arg0);
 }
-serial::Serial* connect(char *cport, char *cbaud = "9600") {
+serial::Serial* connect(char *cport, char *cbaud = "115200") {
 	string port(cport);
 	string sbaud(cbaud);
 	//Validate baud

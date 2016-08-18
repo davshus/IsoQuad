@@ -365,10 +365,7 @@ void loop() {
             teapotPacket[7] = fifoBuffer[9];
             teapotPacket[8] = fifoBuffer[12];
             teapotPacket[9] = fifoBuffer[13];
-            //Serial.write(teapotPacket, 14);
-            for (int i = 0; i < 14; ++i) {
-              Serial.print(teapotPacket[i]);
-            }
+            Serial.write(teapotPacket, 14);
             teapotPacket[11]++; // packetCount, loops at 0xFF on purpose
         #endif
 

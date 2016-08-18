@@ -4,7 +4,9 @@
 #include <conio.h>
 #include <iostream>
 #include <serial.h>
-typedef float quaternion[4];
+#include <mathfu/vector_3.h>
+#include <mathfu/quaternion.h>
+//typedef float tempquat[4];
 #define	EXIT pause(); return 0
 using namespace std;
 void pause() {
@@ -66,7 +68,7 @@ int main(int argc, char *argv[]) {
 			EXIT;
 		}
 	}
-	printf("Ready to start transmitting data!");
+	printf("Ready to start transmitting data!\n");
 	pause();
 	printf("Press Escape to exit...\n");
 	int key; //keyboard command
@@ -76,7 +78,7 @@ int main(int argc, char *argv[]) {
 	int synced = 0;
 	int serialCount = 0;
 	char teapotPacket[14];
-	quaternion q;
+	mathfu::Quaternion<float> q(mathfu::Quaternion<float>::identity);
 	do {
 		key = 0;
 		if (kbhit())

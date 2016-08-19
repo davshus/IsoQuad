@@ -4,7 +4,6 @@
 #include <conio.h>
 #include <iostream>
 #include <serial.h>
-#include <mathfu/vector_3.h>
 #include <mathfu/quaternion.h>
 //typedef float tempquat[4];
 #define	EXIT pause(); return 0
@@ -118,6 +117,7 @@ int main(int argc, char *argv[]) {
 						q[2] = ((teapotPacket[6] << 8) | teapotPacket[7]) / 16384.0f;
 						q[3] = ((teapotPacket[8] << 8) | teapotPacket[9]) / 16384.0f;
 						for (int i = 0; i < 4; i++) if (q[i] >= 2) q[i] = -4 + q[i];
+						q.Normalize();
 						cout << "Quaternion:\t" << q[0] << "\t" << q[1] << "\t" << q[2] << "\t" << q[3] << "\n";
 					}
 				}

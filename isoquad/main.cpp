@@ -77,7 +77,13 @@ int main(int argc, char *argv[]) {
 	int synced = 0;
 	int serialCount = 0;
 	char teapotPacket[14];
-	mathfu::Quaternion<float> q(mathfu::Quaternion<float>::identity);
+	float q[4] = { 1, 0, 0, 1 };
+	//mathfu::Quaternion<float> q(mathfu::Quaternion<float>::identity);
+	mathfu::Quaternion<float> qi(mathfu::Quaternion<float>::identity);
+	mathfu::Quaternion<float> qa(mathfu::Quaternion<float>::identity);
+	mathfu::Vector<float, 3> vec;
+	mathfu::Vector<float, 3> vecForward(0, 0, 1);
+	mathfu::Vector<float, 3> euler;
 	do {
 		key = 0;
 		if (kbhit())
@@ -91,6 +97,11 @@ int main(int argc, char *argv[]) {
 			break;
 		case (int)'w':
 			printf("w detected.\n");
+			break;
+		}*/
+		/*switch (key) {
+		case (int)'w':
+			qi = q.Inverse();
 			break;
 		}*/
 		//Parse through glove input
@@ -117,8 +128,12 @@ int main(int argc, char *argv[]) {
 						q[2] = ((teapotPacket[6] << 8) | teapotPacket[7]) / 16384.0f;
 						q[3] = ((teapotPacket[8] << 8) | teapotPacket[9]) / 16384.0f;
 						for (int i = 0; i < 4; i++) if (q[i] >= 2) q[i] = -4 + q[i];
-						q.Normalize();
-						cout << "Quaternion:\t" << q[0] << "\t" << q[1] << "\t" << q[2] << "\t" << q[3] << "\n";
+						//q.Normalize();
+						//vec = q.ToMatrix() * vecForward;
+						//vec.Normalize();
+						//cout << "Vector:\t" << vec[0] << "\t" << vec[1] << "\t" << vec[2] << endl;
+						//q = q * qi;
+						cout << "Quaternion:\t" << q[0] << "\t" << q[1] << "\t" << q[2] << "\t" << q[3] << endl;
 					}
 				}
 			}

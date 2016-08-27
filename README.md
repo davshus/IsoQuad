@@ -5,7 +5,7 @@ Works via COM Connections.  Uses <a href="https://github.com/wjwwood/serial">Wil
 <br><br>
 <h1>Usage</h1>
 1. Open cmd and navigate to the folder where the release is located.
-2. Enter the command "isoquad <Primary COM Port> [baud rate = 115200]" (<required> [optional]").
+2. Enter the command "isoquad \<Primary COM Port\> [baud rate = 115200]" (\<required\> [optional]").
 3. Follow the on-screen instructions.
 
 To Do:

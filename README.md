@@ -1,9 +1,12 @@
 # IsoQuad
 A remote control for a quadcopter, written in C++ by David Shustin, 2016
 <br>
-Works via COM Connections.  Uses <a href="https://github.com/wjwwood/serial">William Woodall's "serial"</a> to initialize and communicate over COM Ports.
+Works via serial port connections.  Uses <a href="https://github.com/wjwwood/serial">William Woodall's "serial"</a> to initialize and communicate over COM Ports.
 <br><br>
-<h1>Usage</h1>
+# Usage
+1. Ensure that you are connected to the remote device(s).
+    * If you are using a bluetooth connection, please ensure that your bluetooth connection is able to use a virtual serial connection.
+2. Find and note your port name.
 1. Open cmd and navigate to the folder where the release is located.
 2. Enter the command "isoquad \<Primary COM Port\> [baud rate = 115200]" (\<required\> [optional]").
 3. Follow the on-screen instructions.

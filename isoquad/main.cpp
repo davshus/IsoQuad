@@ -8,6 +8,7 @@
 //typedef float tempquat[4];
 #define	EXIT pause(); return 0
 #define PIPE
+//#define QUATERNION
 using namespace std;
 void pause() {
 	printf("Press any key to continue.");
@@ -130,18 +131,12 @@ int main(int argc, char *argv[]) {
 					teapotPacket[serialCount++] = (char)ch;
 					if (serialCount == 14) {
 						serialCount = 0;
-						teapotShort[1] = teapotPacket[2];
-						teapotShort[2] = teapotPacket[3];
-						teapotShort[3] = teapotPacket[4];
-						teapotShort[4] = teapotPacket[5];
-						teapotShort[5] = teapotPacket[6];
-						teapotShort[6] = teapotPacket[7];
-						teapotShort[7] = teapotPacket[8];
-						teapotShort[8] = teapotPacket[9];
-						q[0] = ((teapotShort[2] << 8) | teapotShort[3]) / 16384.0f;
-						q[1] = ((teapotShort[4] << 8) | teapotShort[5]) / 16384.0f;
-						q[2] = ((teapotShort[6] << 8) | teapotShort[7]) / 16384.0f;
-						q[3] = ((teapotShort[8] << 8) | teapotShort[9]) / 16384.0f;
+						for (int x = 0; x < 8; x++)
+							teapotShort[x] = teapotPacket[x + 2];
+						q[0] = ((teapotShort[0] << 8) | teapotShort[1]) / 16384.0f;
+						q[1] = ((teapotShort[2] << 8) | teapotShort[3]) / 16384.0f;
+						q[2] = ((teapotShort[4] << 8) | teapotShort[5]) / 16384.0f;
+						q[3] = ((teapotShort[6] << 8) | teapotShort[7]) / 16384.0f;
 						for (int i = 0; i < 4; i++) if (q[i] >= 2) q[i] = -4 + q[i];
 						q.Normalize();
 						//vec = q.ToMatrix() * vecForward;

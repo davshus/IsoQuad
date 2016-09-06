@@ -77,14 +77,14 @@ int main(int argc, char *argv[]) {
 #endif
 	int key; //keyboard command
 	uint8_t buf[1];
-	char ch;
+	unsigned char ch;
 	SPO->write("l"); //begin transmission
 	int synced = 0;
 	int serialCount = 0;
-	char teapotPacket[14];
+	unsigned char teapotPacket[14];
 	short teapotShort[8];
-	//float q[4] = { 1, 0, 0, 1 };
-	mathfu::Quaternion<float> q(mathfu::Quaternion<float>::identity);
+	float q[4] = { 1.0f, 0.0f, 0.0f, 0.0f };
+	//mathfu::Quaternion<float> q(mathfu::Quaternion<float>::identity);
 	mathfu::Quaternion<float> qi(mathfu::Quaternion<float>::identity);
 	mathfu::Quaternion<float> qa(mathfu::Quaternion<float>::identity);
 	mathfu::Vector<float, 3> axis;
@@ -116,7 +116,7 @@ int main(int argc, char *argv[]) {
 			//Credit to Jeff Rowberg for writing the original Java/Processing code that the following code is ported from.
 			//https://github.com/jrowberg/i2cdevlib/blob/master/Arduino/MPU6050/examples/MPU6050_DMP6/Processing/MPUTeapot/MPUTeapot.pde
 			if (SPO->read(buf, 1)) {
-				ch = (char)buf[0];
+				ch = (unsigned char)buf[0];
 				if (synced == 0 && ch != '$') continue;
 				synced = 1;
 				if ((serialCount == 1 && ch != 0x02)
@@ -127,27 +127,22 @@ int main(int argc, char *argv[]) {
 					continue;
 				}
 				if (serialCount > 0 || ch == '$') {
-					teapotPacket[serialCount++] = (char)ch;
+					teapotPacket[serialCount++] = (unsigned char)ch;
 					if (serialCount == 14) {
 						serialCount = 0;
-						teapotShort[1] = teapotPacket[2];
-						teapotShort[2] = teapotPacket[3];
-						teapotShort[3] = teapotPacket[4];
-						teapotShort[4] = teapotPacket[5];
-						teapotShort[5] = teapotPacket[6];
-						teapotShort[6] = teapotPacket[7];
-						teapotShort[7] = teapotPacket[8];
-						teapotShort[8] = teapotPacket[9];
-						q[0] = ((teapotShort[2] << 8) | teapotShort[3]) / 16384.0f;
-						q[1] = ((teapotShort[4] << 8) | teapotShort[5]) / 16384.0f;
-						q[2] = ((teapotShort[6] << 8) | teapotShort[7]) / 16384.0f;
-						q[3] = ((teapotShort[8] << 8) | teapotShort[9]) / 16384.0f;
+						q[0] = ((teapotPacket[2] << 8) | teapotPacket[3]) / 16384.0f;
+						q[1] = ((teapotPacket[4] << 8) | teapotPacket[5]) / 16384.0f;
+						q[2] = ((teapotPacket[6] << 8) | teapotPacket[7]) / 16384.0f;
+						q[3] = ((teapotPacket[8] << 8) | teapotPacket[9]) / 16384.0f;
 						for (int i = 0; i < 4; i++) if (q[i] >= 2) q[i] = -4 + q[i];
-						q.Normalize();
+						//q.Normalize();
 						//vec = q.ToMatrix() * vecForward;
 						//vec.Normalize();
 						//cout << "Vector:\t" << vec[0] << "\t" << vec[1] << "\t" << vec[2] << endl;
 						//q = q * qi;
+						//for (int i = 0; i < 14; i++)
+						//	cout << (unsigned int)(teapotPacket[i]) << "\t";
+						cout << "\n";
 
 //#define DELAYED
 #ifdef EULER_ANGLES

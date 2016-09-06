@@ -1,4 +1,2 @@
-﻿  main.cpp
-c:\users\david shustin\desktop\projects\isoquad\isoquad\main.cpp(91): warning C4101: 'theta': unreferenced local variable
-  isoquad.vcxproj -> C:\Users\David Shustin\Desktop\Projects\IsoQuad\Debug\isoquad.exe
+﻿  isoquad.vcxproj -> C:\Users\David Shustin\Desktop\Projects\IsoQuad\Debug\isoquad.exe
   isoquad.vcxproj -> C:\Users\David Shustin\Desktop\Projects\IsoQuad\Debug\isoquad.pdb (Partial PDB)

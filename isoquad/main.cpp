@@ -7,6 +7,7 @@
 #include <mathfu/quaternion.h>
 //typedef float tempquat[4];
 #define	EXIT pause(); return 0
+#define PIPE
 using namespace std;
 void pause() {
 	printf("Press any key to continue.");
@@ -43,7 +44,9 @@ serial::Serial* connect(char *cport, char *cbaud = "115200") {
 	}
 }
 int main(int argc, char *argv[]) {
+#ifndef PIPE
 	printf("\n@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n####### ISOTONIC QUADCOPTER #######\n#######    PROGRAMMED BY    #######\n####### DAVID SHUSTIN, 2016 #######\n@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n\n");
+#endif
 	if (argc < 2 || argc > 3) {
 		printArgUsage(argv[0]);
 		EXIT;
@@ -67,21 +70,25 @@ int main(int argc, char *argv[]) {
 			EXIT;
 		}
 	}
+#ifndef PIPE
 	printf("Ready to start transmitting data!\n");
 	pause();
 	printf("Press Escape to exit...\n");
+#endif
 	int key; //keyboard command
 	uint8_t buf[1];
-	char ch;
+	unsigned char ch;
 	SPO->write("l"); //begin transmission
 	int synced = 0;
 	int serialCount = 0;
-	char teapotPacket[14];
-	float q[4] = { 1, 0, 0, 1 };
+	unsigned char teapotPacket[14];
+	short teapotShort[8];
+	float q[4] = { 1.0f, 0.0f, 0.0f, 0.0f };
 	//mathfu::Quaternion<float> q(mathfu::Quaternion<float>::identity);
 	mathfu::Quaternion<float> qi(mathfu::Quaternion<float>::identity);
 	mathfu::Quaternion<float> qa(mathfu::Quaternion<float>::identity);
-	mathfu::Vector<float, 3> vec;
+	mathfu::Vector<float, 3> axis;
+	float theta;
 	mathfu::Vector<float, 3> vecForward(0, 0, 1);
 	mathfu::Vector<float, 3> euler;
 	do {
@@ -109,7 +116,7 @@ int main(int argc, char *argv[]) {
 			//Credit to Jeff Rowberg for writing the original Java/Processing code that the following code is ported from.
 			//https://github.com/jrowberg/i2cdevlib/blob/master/Arduino/MPU6050/examples/MPU6050_DMP6/Processing/MPUTeapot/MPUTeapot.pde
 			if (SPO->read(buf, 1)) {
-				ch = (char)buf[0];
+				ch = (unsigned char)buf[0];
 				if (synced == 0 && ch != '$') continue;
 				synced = 1;
 				if ((serialCount == 1 && ch != 0x02)
@@ -120,7 +127,7 @@ int main(int argc, char *argv[]) {
 					continue;
 				}
 				if (serialCount > 0 || ch == '$') {
-					teapotPacket[serialCount++] = (char)ch;
+					teapotPacket[serialCount++] = (unsigned char)ch;
 					if (serialCount == 14) {
 						serialCount = 0;
 						q[0] = ((teapotPacket[2] << 8) | teapotPacket[3]) / 16384.0f;
@@ -133,7 +140,36 @@ int main(int argc, char *argv[]) {
 						//vec.Normalize();
 						//cout << "Vector:\t" << vec[0] << "\t" << vec[1] << "\t" << vec[2] << endl;
 						//q = q * qi;
+						//for (int i = 0; i < 14; i++)
+						//	cout << (unsigned int)(teapotPacket[i]) << "\t";
+						cout << "\n";
+
+//#define DELAYED
+#ifdef EULER_ANGLES
+						euler = q.ToEulerAngles();
+						printf("Eulers:");
+						for (int i = 0; i < 3; i++) {
+							euler[i] *= 180;
+							euler[i] /= M_PI;
+							euler[i] += 180;
+							printf("\t%f", euler[i]);
+						}
+						printf("\n");
+#endif
+#ifdef AXIS_ANGLE
+						q.ToAngleAxis(&theta, &axis);
+						printf("Axis-Angle:\t%f\t%f\t%f\t%f\n", theta, axis[0], axis[1], axis[2]);
+#endif
+#ifdef QUATERNION
 						cout << "Quaternion:\t" << q[0] << "\t" << q[1] << "\t" << q[2] << "\t" << q[3] << endl;
+#endif
+#ifdef PIPE
+						printf("%f\t%f\t%f\t%f\n", q[0], q[1], q[2], q[3]);
+#endif
+#ifdef DELAYED
+						_sleep(500);
+						SPO->flush();
+#endif
 					}
 				}
 			}

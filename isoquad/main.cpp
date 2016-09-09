@@ -1,19 +1,16 @@
 #pragma warning(disable:4996)
 #include <stdio.h>
 #include <string>
-#include <conio.h>
+//#include <conio.h>
 #include <iostream>
 #include <serial.h>
-#include <mathfu/quaternion.h>
+#include "glm.hpp"
+#include "gtc/quaternion.hpp"
 //typedef float tempquat[4];
-#define	EXIT pause(); return 0
-#define PIPE
+
+//#define PIPE
 using namespace std;
-void pause() {
-	printf("Press any key to continue.");
-	_getch();
-	printf("\n");
-}
+using namespace glm;
 void printArgUsage(char* arg0) {
 	printf("Incorrect argument usage!\n Correct usage: %s <port> <baud rate>\n", arg0);
 }
@@ -44,12 +41,10 @@ serial::Serial* connect(char *cport, char *cbaud = "115200") {
 	}
 }
 int main(int argc, char *argv[]) {
-#ifndef PIPE
 	printf("\n@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n####### ISOTONIC QUADCOPTER #######\n#######    PROGRAMMED BY    #######\n####### DAVID SHUSTIN, 2016 #######\n@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n\n");
-#endif
 	if (argc < 2 || argc > 3) {
 		printArgUsage(argv[0]);
-		EXIT;
+		return -2;
 	}
 	serial::Serial *SPO;
 	if (argc == 2) {
@@ -58,7 +53,7 @@ int main(int argc, char *argv[]) {
 		}
 		catch (const exception& e) {
 			cout << e.what() << endl;
-			EXIT;
+			return -1;
 		}
 	}
 	else {
@@ -67,14 +62,10 @@ int main(int argc, char *argv[]) {
 		}
 		catch (const exception& e) {
 			cout << e.what() << endl;
-			EXIT;
+			return -1;
 		}
 	}
-#ifndef PIPE
-	printf("Ready to start transmitting data!\n");
-	pause();
-	printf("Press Escape to exit...\n");
-#endif
+	printf("Ready to start visualization!\n");
 	int key; //keyboard command
 	uint8_t buf[1];
 	unsigned char ch;
@@ -82,35 +73,16 @@ int main(int argc, char *argv[]) {
 	int synced = 0;
 	int serialCount = 0;
 	unsigned char teapotPacket[14];
-	short teapotShort[8];
-	float q[4] = { 1.0f, 0.0f, 0.0f, 0.0f };
-	//mathfu::Quaternion<float> q(mathfu::Quaternion<float>::identity);
-	mathfu::Quaternion<float> qi(mathfu::Quaternion<float>::identity);
-	mathfu::Quaternion<float> qa(mathfu::Quaternion<float>::identity);
-	mathfu::Vector<float, 3> axis;
+	//short teapotShort[8];
+	//float q[4] = { 1.0f, 0.0f, 0.0f, 0.0f };
+	quat q;
+	quat qi;
+	quat qa;
+	/*vec3 axis;
 	float theta;
-	mathfu::Vector<float, 3> vecForward(0, 0, 1);
-	mathfu::Vector<float, 3> euler;
+	vec3 vecForward(0, 0, 1);
+	vec3 euler;*/
 	do {
-		key = 0;
-		if (kbhit())
-			key = getch();
-		/*switch (key) {
-		case 59:
-			printf("F1 detected.\n");
-			break;
-		case 60:
-			printf("F2 detected.\n");
-			break;
-		case (int)'w':
-			printf("w detected.\n");
-			break;
-		}*/
-		/*switch (key) {
-		case (int)'w':
-			qi = q.Inverse();
-			break;
-		}*/
 		//Parse through glove input
 		while (SPO->available()) {
 			//Credit to Jeff Rowberg for writing the original Java/Processing code that the following code is ported from.
@@ -135,41 +107,8 @@ int main(int argc, char *argv[]) {
 						q[2] = ((teapotPacket[6] << 8) | teapotPacket[7]) / 16384.0f;
 						q[3] = ((teapotPacket[8] << 8) | teapotPacket[9]) / 16384.0f;
 						for (int i = 0; i < 4; i++) if (q[i] >= 2) q[i] = -4 + q[i];
-						//q.Normalize();
-						//vec = q.ToMatrix() * vecForward;
-						//vec.Normalize();
-						//cout << "Vector:\t" << vec[0] << "\t" << vec[1] << "\t" << vec[2] << endl;
-						//q = q * qi;
-						//for (int i = 0; i < 14; i++)
-						//	cout << (unsigned int)(teapotPacket[i]) << "\t";
 						cout << "\n";
 
-//#define DELAYED
-#ifdef EULER_ANGLES
-						euler = q.ToEulerAngles();
-						printf("Eulers:");
-						for (int i = 0; i < 3; i++) {
-							euler[i] *= 180;
-							euler[i] /= M_PI;
-							euler[i] += 180;
-							printf("\t%f", euler[i]);
-						}
-						printf("\n");
-#endif
-#ifdef AXIS_ANGLE
-						q.ToAngleAxis(&theta, &axis);
-						printf("Axis-Angle:\t%f\t%f\t%f\t%f\n", theta, axis[0], axis[1], axis[2]);
-#endif
-#ifdef QUATERNION
-						cout << "Quaternion:\t" << q[0] << "\t" << q[1] << "\t" << q[2] << "\t" << q[3] << endl;
-#endif
-#ifdef PIPE
-						printf("%f\t%f\t%f\t%f\n", q[0], q[1], q[2], q[3]);
-#endif
-#ifdef DELAYED
-						_sleep(500);
-						SPO->flush();
-#endif
 					}
 				}
 			}
@@ -179,5 +118,5 @@ int main(int argc, char *argv[]) {
 	if (SPO->isOpen())
 		SPO->close();
 	delete SPO;
-	EXIT;
+	return 0;
 }

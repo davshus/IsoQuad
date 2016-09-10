@@ -77,7 +77,7 @@
       <AdditionalIncludeDirectories>include;../glm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>serial.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>serial.lib;glew32.lib;glfw3.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>SerialLib</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>

@@ -2,8 +2,8 @@
 #define FUNCS
 #include <stdio.h>
 #include <string>
-#include "GL/glew.h"
-#include "GL/glfw3.h"
+#include <GL/glew.h>
+#include <GL/glfw3.h>
 #include <iostream>
 #include <fstream>
 #include "serial.h"

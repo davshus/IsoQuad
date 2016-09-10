@@ -1,44 +1,9 @@
 #pragma warning(disable:4996)
-#include <stdio.h>
-#include <string>
-//#include <conio.h>
-#include <iostream>
-#include <serial.h>
-#include "glm.hpp"
-#include "gtc/quaternion.hpp"
-//typedef float tempquat[4];
-
-//#define PIPE
+#include "funcs.h"
 using namespace std;
 using namespace glm;
 void printArgUsage(char* arg0) {
 	printf("Incorrect argument usage!\n Correct usage: %s <port> <baud rate>\n", arg0);
-}
-serial::Serial* connect(char *cport, char *cbaud = "115200") {
-	string port(cport);
-	string sbaud(cbaud);
-	//Validate baud
-	int baud;
-	try {
-		baud = stoi(sbaud);
-	}
-	catch (out_of_range) {
-		throw out_of_range("Baud rate is out of range.");
-	}
-	catch (invalid_argument) {
-		throw invalid_argument("Baud rate is not a number.");
-	}
-	if (baud < 0) {
-		throw out_of_range("Baud rate is a negative number.");
-	}
-	try {
-		serial::Serial *thisSerial = new serial::Serial(port, baud, serial::Timeout(1000));
-		return thisSerial;
-	}
-	catch (const exception& e) {
-		printf("There was a problem creating a Serial connection.\n");
-		throw exception(e.what());
-	}
 }
 int main(int argc, char *argv[]) {
 	printf("\n@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n####### ISOTONIC QUADCOPTER #######\n#######    PROGRAMMED BY    #######\n####### DAVID SHUSTIN, 2016 #######\n@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n\n");
@@ -66,6 +31,51 @@ int main(int argc, char *argv[]) {
 		}
 	}
 	printf("Ready to start visualization!\n");
+	//Start OpenGL
+	if (!glfwInit()) {
+		fprintf(stderr, "Failed to initialize GLFW\n");
+	}
+	glfwWindowHint(GLFW_SAMPLES, 4);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+	GLFWwindow* window;
+	int width = 1366;
+	int height = 768;
+	window = glfwCreateWindow(width, height, "X-Platform FTW!", NULL, NULL);
+	if (window == NULL) {
+		fprintf(stderr, "Failed to open GLFW Window.\nIf you have an Intel GPU, you can't play No Man's Sky, though why would you want to?.\nAlso, you should use v2.1 instead.\n");
+		glfwTerminate();
+		return -1;
+	}
+	glfwMakeContextCurrent(window);
+	glewExperimental = true;
+	if (glewInit() != GLEW_OK) {
+		fprintf(stderr, "Failed to initialize GLEW.\n");
+		return -1;
+	}
+	// Ensure we can capture the escape key being pressed below
+	glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_TRUE);
+	GLuint VertexArrayID;
+	glGenVertexArrays(1, &VertexArrayID);
+	glBindVertexArray(VertexArrayID);
+	static const GLfloat g_vertex_buffer_data[] = {
+		0.433f, 0.0f, 0.25f,
+		-0.433f, 0.0f, 0.25f,
+		0.0f,  0.0f, -0.5f,
+	};
+	GLuint vertexbuffer;
+	glGenBuffers(1, &vertexbuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_STATIC_DRAW);
+	glm::mat4 Projection = glm::perspective(glm::radians(85.0f), (float)width / (float)height, 0.1f, 100.0f);
+	glm::mat4 View = glm::lookAt(glm::vec3(0, 0, 2), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
+	glm::mat4 Model = glm::mat4(1.0f);
+	glm::mat4 MVP = Projection * View * Model;
+
+	GLuint programID = LoadShaders("SimpleVertexShader.vert", "SimpleFragmentShader.frag");
+	GLuint MatrixID = glGetUniformLocation(programID, "MVP");
 	int key; //keyboard command
 	uint8_t buf[1];
 	unsigned char ch;
@@ -75,7 +85,8 @@ int main(int argc, char *argv[]) {
 	unsigned char teapotPacket[14];
 	//short teapotShort[8];
 	//float q[4] = { 1.0f, 0.0f, 0.0f, 0.0f };
-	quat q;
+	quat mpu;
+	quat ogl;
 	quat qi;
 	quat qa;
 	/*vec3 axis;
@@ -102,11 +113,11 @@ int main(int argc, char *argv[]) {
 					teapotPacket[serialCount++] = (unsigned char)ch;
 					if (serialCount == 14) {
 						serialCount = 0;
-						q[0] = ((teapotPacket[2] << 8) | teapotPacket[3]) / 16384.0f;
-						q[1] = ((teapotPacket[4] << 8) | teapotPacket[5]) / 16384.0f;
-						q[2] = ((teapotPacket[6] << 8) | teapotPacket[7]) / 16384.0f;
-						q[3] = ((teapotPacket[8] << 8) | teapotPacket[9]) / 16384.0f;
-						for (int i = 0; i < 4; i++) if (q[i] >= 2) q[i] = -4 + q[i];
+						mpu[0] = ((teapotPacket[2] << 8) | teapotPacket[3]) / 16384.0f;
+						mpu[1] = ((teapotPacket[4] << 8) | teapotPacket[5]) / 16384.0f;
+						mpu[2] = ((teapotPacket[6] << 8) | teapotPacket[7]) / 16384.0f;
+						mpu[3] = ((teapotPacket[8] << 8) | teapotPacket[9]) / 16384.0f;
+						for (int i = 0; i < 4; i++) if (mpu[i] >= 2) mpu[i] = -4 + mpu[i];
 						cout << "\n";
 
 					}
@@ -114,8 +125,29 @@ int main(int argc, char *argv[]) {
 			}
 		}
 		//memset(buffer, '\0', 1024);
-	} while (key != 27);
-	if (SPO->isOpen())
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		glUseProgram(programID);
+		ogl.w = mpu.w;
+		ogl.x = mpu.x;
+		ogl.y = mpu.z;
+		ogl.z = -mpu.y;
+		Model = mat4_cast(ogl);
+		MVP = Projection * View * Model;
+		glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);
+		glEnableVertexAttribArray(0);
+		glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+		glDrawArrays(GL_TRIANGLES, 0, 3);
+		glDisableVertexAttribArray(0);
+		// Swap buffers
+		glfwSwapBuffers(window);
+		glfwPollEvents();
+
+	} while (SPO->isOpen() && glfwGetKey(window, GLFW_KEY_ESCAPE) != GLFW_PRESS &&
+		glfwWindowShouldClose(window) == 0);
+	if (!SPO->isOpen())
+		cout << "Program terminated because the serial port was closed.";
+	else
 		SPO->close();
 	delete SPO;
 	return 0;

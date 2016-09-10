@@ -64,11 +64,23 @@ int main(int argc, char *argv[]) {
 		0.433f, 0.0f, 0.25f,
 		-0.433f, 0.0f, 0.25f,
 		0.0f,  0.0f, -0.5f,
+		0.433f, 0.0f, -0.5f,
+		-0.433f, 0.0f, -0.5f,
+		0.0f, 0.5f, -0.5f
 	};
+	/*static const GLfloat g_color_buffer_data[] = {
+		0.4f, 0.6f, 1.0f,
+		0.4f, 0.6f, 1.0f,
+		1.0f, 1.0f, 1.0f
+	};*/
 	GLuint vertexbuffer;
 	glGenBuffers(1, &vertexbuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_STATIC_DRAW);
+	/*GLuint colorbuffer;
+	glGenBuffers(1, &colorbuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, colorbuffer);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(g_color_buffer_data), g_color_buffer_data, GL_STATIC_DRAW);*/
 	glm::mat4 Projection = glm::perspective(glm::radians(85.0f), (float)width / (float)height, 0.1f, 100.0f);
 	glm::mat4 View = glm::lookAt(glm::vec3(0, 0, 2), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
 	glm::mat4 Model = glm::mat4(1.0f);
@@ -127,16 +139,22 @@ int main(int argc, char *argv[]) {
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glUseProgram(programID);
 		ogl.w = mpu.w;
-		ogl.x = mpu.x;
-		ogl.y = mpu.z;
-		ogl.z = -mpu.y;
+		ogl.x = -mpu.z;
+		ogl.y = mpu.x;
+		ogl.z = mpu.y;
+		if (glfwGetKey(window, GLFW_KEY_F8) == GLFW_PRESS) {
+			ogl.w = 0.707;
+			ogl.x = 0.707;
+			ogl.y = 0;
+			ogl.z = 0;
+		}
 		Model = mat4_cast(ogl);
 		MVP = Projection * View * Model;
 		glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);
 		glEnableVertexAttribArray(0);
 		glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
-		glDrawArrays(GL_TRIANGLES, 0, 3);
+		glDrawArrays(GL_TRIANGLES, 0, 6);
 		glDisableVertexAttribArray(0);
 		// Swap buffers
 		glfwSwapBuffers(window);

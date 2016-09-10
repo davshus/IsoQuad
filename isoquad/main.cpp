@@ -118,7 +118,6 @@ int main(int argc, char *argv[]) {
 						mpu[2] = ((teapotPacket[6] << 8) | teapotPacket[7]) / 16384.0f;
 						mpu[3] = ((teapotPacket[8] << 8) | teapotPacket[9]) / 16384.0f;
 						for (int i = 0; i < 4; i++) if (mpu[i] >= 2) mpu[i] = -4 + mpu[i];
-						cout << "\n";
 
 					}
 				}

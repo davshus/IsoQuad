@@ -87,6 +87,7 @@ int main(int argc, char *argv[]) {
 	glm::mat4 MVP = Projection * View * Model;
 
 	GLuint programID = LoadShaders("SimpleVertexShader.vert", "SimpleFragmentShader.frag");
+	GLuint programID2 = LoadShaders("SimpleVertexShader2.vert", "SimpleFragmentShader2.frag");
 	GLuint MatrixID = glGetUniformLocation(programID, "MVP");
 	int key; //keyboard command
 	uint8_t buf[1];
@@ -99,13 +100,21 @@ int main(int argc, char *argv[]) {
 	//float q[4] = { 1.0f, 0.0f, 0.0f, 0.0f };
 	quat mpu;
 	quat ogl;
-	quat qi;
-	quat qa;
+	quat ogli;
+	//quat qa;
+	quat quatIdentity;
+	//chrono::time_point<chrono::steady_clock> pastTime;
+	//chrono::milliseconds deltaTime;
+	chrono::time_point<chrono::steady_clock> atSerial = chrono::steady_clock::now();
+	chrono::milliseconds sinceSerial;
+	bool hanging = false;
+	//chrono::nanoseconds nanoTime;
 	/*vec3 axis;
 	float theta;
 	vec3 vecForward(0, 0, 1);
 	vec3 euler;*/
 	do {
+		//pastTime = chrono::steady_clock::now();
 		//Parse through glove input
 		while (SPO->available()) {
 			//Credit to Jeff Rowberg for writing the original Java/Processing code that the following code is ported from.
@@ -134,12 +143,19 @@ int main(int argc, char *argv[]) {
 					}
 				}
 			}
+			atSerial = chrono::steady_clock::now();
+			if (hanging)
+				hanging = false;
 		}
 		//memset(buffer, '\0', 1024);
+		// Enable depth test
+		glEnable(GL_DEPTH_TEST);
+		// Accept fragment if it closer to the camera than the former one
+		glDepthFunc(GL_LESS);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glUseProgram(programID);
 		ogl.w = mpu.w;
-		ogl.x = -mpu.z;
+		ogl.x = mpu.z;
 		ogl.y = mpu.x;
 		ogl.z = mpu.y;
 		if (glfwGetKey(window, GLFW_KEY_F8) == GLFW_PRESS) {
@@ -148,18 +164,48 @@ int main(int argc, char *argv[]) {
 			ogl.y = 0;
 			ogl.z = 0;
 		}
-		Model = mat4_cast(ogl);
+		if (glfwGetKey(window, GLFW_KEY_F9) == GLFW_PRESS)
+			ogli = inverse(ogl);
+		Model = mat4_cast(ogl * ogli);
 		MVP = Projection * View * Model;
 		glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);
 		glEnableVertexAttribArray(0);
 		glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
-		glDrawArrays(GL_TRIANGLES, 0, 6);
+		glDrawArrays(GL_TRIANGLES, 0, 3);
+		glDisableVertexAttribArray(0);
+		glUseProgram(programID2);
+		glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);
+		glEnableVertexAttribArray(0);
+		glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+		glDrawArrays(GL_TRIANGLES, 3, 3);
 		glDisableVertexAttribArray(0);
 		// Swap buffers
 		glfwSwapBuffers(window);
 		glfwPollEvents();
-
+		//deltaTime = chrono::duration_cast<chrono::milliseconds>(chrono::steady_clock::now() - pastTime);
+		sinceSerial = chrono::duration_cast<chrono::milliseconds>(chrono::steady_clock::now() - atSerial);
+		if (sinceSerial.count() > 1000) {
+			if (!hanging) {
+				printf("A problem occurred, causing data transfer to hang.  Please wait while the system is revived.\n");
+				hanging = true;
+			}
+			printf("Sending REVIVE message...\n");
+			try {
+				SPO->write("l");
+			}
+			catch (serial::PortNotOpenedException &e) {
+				printf("PortNotOpenedException: %s\n", e.what());
+			}
+			catch (serial::SerialException &e) {
+				printf("SerialException: %s\n", e.what());
+			}
+			catch (serial::IOException &e) {
+				printf("IOException: %s\n", e.what());
+			}
+			this_thread::sleep_for(chrono::milliseconds(500));
+		}
 	} while (SPO->isOpen() && glfwGetKey(window, GLFW_KEY_ESCAPE) != GLFW_PRESS &&
 		glfwWindowShouldClose(window) == 0);
 	if (!SPO->isOpen())

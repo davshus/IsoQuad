@@ -134,10 +134,10 @@ int main(int argc, char *argv[]) {
 					teapotPacket[serialCount++] = (unsigned char)ch;
 					if (serialCount == 14) {
 						serialCount = 0;
-						mpu[0] = ((teapotPacket[2] << 8) | teapotPacket[3]) / 16384.0f;
-						mpu[1] = ((teapotPacket[4] << 8) | teapotPacket[5]) / 16384.0f;
-						mpu[2] = ((teapotPacket[6] << 8) | teapotPacket[7]) / 16384.0f;
-						mpu[3] = ((teapotPacket[8] << 8) | teapotPacket[9]) / 16384.0f;
+						mpu.w = ((teapotPacket[2] << 8) | teapotPacket[3]) / 16384.0f;
+						mpu.x = ((teapotPacket[4] << 8) | teapotPacket[5]) / 16384.0f;
+						mpu.y = ((teapotPacket[6] << 8) | teapotPacket[7]) / 16384.0f;
+						mpu.z = ((teapotPacket[8] << 8) | teapotPacket[9]) / 16384.0f;
 						for (int i = 0; i < 4; i++) if (mpu[i] >= 2) mpu[i] = -4 + mpu[i];
 
 					}
@@ -155,9 +155,9 @@ int main(int argc, char *argv[]) {
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glUseProgram(programID);
 		ogl.w = mpu.w;
-		ogl.x = mpu.z;
-		ogl.y = mpu.x;
-		ogl.z = mpu.y;
+		ogl.x = mpu.x;
+		ogl.y = mpu.z;
+		ogl.z = -mpu.y;
 		if (glfwGetKey(window, GLFW_KEY_F8) == GLFW_PRESS) {
 			ogl.w = 0.707;
 			ogl.x = 0.707;

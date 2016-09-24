@@ -92,7 +92,7 @@ int main(int argc, char *argv[]) {
 	int key; //keyboard command
 	uint8_t buf[1];
 	unsigned char ch;
-	SPO->write("l"); //begin transmission
+	SPO ->write("l"); //begin transmission
 	int synced = 0;
 	int serialCount = 0;
 	unsigned char teapotPacket[14];
@@ -154,6 +154,7 @@ int main(int argc, char *argv[]) {
 		glDepthFunc(GL_LESS);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glUseProgram(programID);
+		mpu = normalize(mpu);
 		ogl.w = mpu.w;
 		ogl.x = mpu.x;
 		ogl.y = mpu.z;
@@ -164,9 +165,10 @@ int main(int argc, char *argv[]) {
 			ogl.y = 0;
 			ogl.z = 0;
 		}
+		ogl = normalize(ogl);
 		if (glfwGetKey(window, GLFW_KEY_F9) == GLFW_PRESS)
 			ogli = inverse(ogl);
-		Model = mat4_cast(ogl * ogli);
+		Model = toMat4(normalize(ogli * ogl));
 		MVP = Projection * View * Model;
 		glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);
 		glEnableVertexAttribArray(0);

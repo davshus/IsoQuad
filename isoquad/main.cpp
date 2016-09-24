@@ -204,6 +204,21 @@ int main(int argc, char *argv[]) {
 			catch (serial::IOException &e) {
 				printf("IOException: %s\n", e.what());
 			}
+			if (SPO->isOpen()) {
+				printf("Attempting to reopen serial connection...");
+				try {
+					SPO->open();
+				}
+				catch (serial::SerialException &e) {
+					printf("SerialException: %s\n", e.what());
+				}
+				catch (serial::IOException &e) {
+					printf("IOException: %s\n", e.what());
+				}
+				catch (invalid_argument &e) {
+					printf("Invalid Argument: %s\n", e.what());
+				}
+			}
 			this_thread::sleep_for(chrono::milliseconds(500));
 		}
 	} while (SPO->isOpen() && glfwGetKey(window, GLFW_KEY_ESCAPE) != GLFW_PRESS &&

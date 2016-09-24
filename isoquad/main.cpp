@@ -165,16 +165,6 @@ int main(int argc, char *argv[]) {
 			ogl.y = 0;
 			ogl.z = 0;
 		}
-		if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS) {
-			printf("Reconnecting...\n");
-			if (SPO->isOpen())
-				SPO->close();
-			SPO->open();
-			if (SPO->waitReadable())
-				printf("Connected!");
-			else
-				printf("waitReadable was interrupted.\n");
-		}
 		ogl = normalize(ogl);
 		if (glfwGetKey(window, GLFW_KEY_F9) == GLFW_PRESS)
 			ogli = inverse(ogl);

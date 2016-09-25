@@ -166,7 +166,7 @@ int main(int argc, char *argv[]) {
 			ogl.z = 0;
 		}
 		ogl = normalize(ogl);
-		if (glfwGetKey(window, GLFW_KEY_F9) == GLFW_PRESS)
+		if (glfwGetKey(window, GLFW_KEY_F9) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
 			ogli = inverse(ogl);
 		Model = toMat4(normalize(ogli * ogl));
 		MVP = Projection * View * Model;

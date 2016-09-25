@@ -53,6 +53,7 @@ int main(int argc, char *argv[]) {
 	}
 	glfwMakeContextCurrent(window);
 	glfwSetWindowSizeCallback(window, resize);
+	glfwSetWindowPos(window, 100, 100);
 	//glfwSetWindowAspectRatio(window, 16, 9);
 	glewExperimental = true;
 	if (glewInit() != GLEW_OK) {
@@ -112,6 +113,7 @@ int main(int argc, char *argv[]) {
 	chrono::time_point<chrono::steady_clock> atSerial = chrono::steady_clock::now();
 	chrono::milliseconds sinceSerial;
 	bool hanging = false;
+	bool perspective = true;
 	//chrono::nanoseconds nanoTime;
 	/*vec3 axis;
 	float theta;
@@ -213,6 +215,10 @@ int main(int argc, char *argv[]) {
 			}
 			this_thread::sleep_for(chrono::milliseconds(500));
 		}
+		if (glfwGetKey(window, GLFW_KEY_O) == GLFW_PRESS)
+			Projection = glm::ortho(-width/1000.0f, width/1000.0f, -height/1000.0f, height/1000.0f, 0.0f, 50.0f);
+		if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS)
+			Projection = glm::perspective(glm::radians(85.0f), (float)width / (float)height, 0.1f, 100.0f);
 		/*if (glfwGetKey(window, GLFW_KEY_F11) == GLFW_PRESS) {
 			this_thread::sleep_for(chrono::milliseconds(500));
 			fullscreen = !fullscreen;

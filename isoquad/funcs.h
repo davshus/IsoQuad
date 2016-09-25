@@ -14,6 +14,12 @@
 #include "glm/gtc/quaternion.hpp"
 #include "glm/gtx/quaternion.hpp"
 using namespace std;
+using namespace glm;
+extern int width;
+extern int height;
+extern mat4 Projection;
+extern mat4 Scale;
+extern float baseScale;
 serial::Serial* connect(char *cport, char *cbaud = "115200") {
 	string port(cport);
 	string sbaud(cbaud);
@@ -134,5 +140,13 @@ GLuint LoadShaders(const char * vertex_file_path, const char * fragment_file_pat
 	glDeleteShader(FragmentShaderID);
 
 	return ProgramID;
+}
+//Callbacks
+void resize(GLFWwindow *window, int WIDTH, int HEIGHT) {
+	width = WIDTH;
+	height = HEIGHT;
+	Projection = glm::perspective(glm::radians(70.0f), (float)width / (float)height, 0.1f, 100.0f);
+	Scale = scale(vec3(baseScale));
+	glViewport(0, 0, width, height);
 }
 #endif

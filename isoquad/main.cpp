@@ -1,7 +1,10 @@
 #pragma warning(disable:4996)
 #include "funcs.h"
-using namespace std;
-using namespace glm;
+int width = 1920;
+int height = 1080;
+float baseScale = 2.0f;
+mat4 Scale = scale(vec3(baseScale));
+mat4 Projection;
 void printArgUsage(char* arg0) {
 	printf("Incorrect argument usage!\n Correct usage: %s <port> <baud rate>\n", arg0);
 }
@@ -41,15 +44,15 @@ int main(int argc, char *argv[]) {
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	GLFWwindow* window;
-	int width = 1366;
-	int height = 768;
-	window = glfwCreateWindow(width, height, "X-Platform FTW!", NULL, NULL);
+	window = glfwCreateWindow(width, height, "IsoQuad - Written by David Shustin, 2016", NULL, NULL);
 	if (window == NULL) {
 		fprintf(stderr, "Failed to open GLFW Window.\nIf you have an Intel GPU, you can't play No Man's Sky, though why would you want to?.\nAlso, you should use v2.1 instead.\n");
 		glfwTerminate();
 		return -1;
 	}
 	glfwMakeContextCurrent(window);
+	glfwSetWindowSizeCallback(window, resize);
+	//glfwSetWindowAspectRatio(window, 16, 9);
 	glewExperimental = true;
 	if (glewInit() != GLEW_OK) {
 		fprintf(stderr, "Failed to initialize GLEW.\n");
@@ -81,7 +84,7 @@ int main(int argc, char *argv[]) {
 	glGenBuffers(1, &colorbuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, colorbuffer);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(g_color_buffer_data), g_color_buffer_data, GL_STATIC_DRAW);*/
-	glm::mat4 Projection = glm::perspective(glm::radians(85.0f), (float)width / (float)height, 0.1f, 100.0f);
+	Projection = glm::perspective(glm::radians(85.0f), (float)width / (float)height, 0.1f, 100.0f);
 	glm::mat4 View = glm::lookAt(glm::vec3(0, 0, 2), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
 	glm::mat4 Model = glm::mat4(1.0f);
 	glm::mat4 MVP = Projection * View * Model;
@@ -168,7 +171,7 @@ int main(int argc, char *argv[]) {
 		ogl = normalize(ogl);
 		if (glfwGetKey(window, GLFW_KEY_F9) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
 			ogli = inverse(ogl);
-		Model = toMat4(normalize(ogli * ogl));
+		Model = toMat4(normalize(ogli * ogl)) * Scale;
 		MVP = Projection * View * Model;
 		glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);
 		glEnableVertexAttribArray(0);

@@ -44,7 +44,8 @@ int main(int argc, char *argv[]) {
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	GLFWwindow* window;
-	window = glfwCreateWindow(width, height, "IsoQuad - Written by David Shustin, 2016", NULL, NULL);
+	char* windowTitle = "IsoQuad";
+	window = glfwCreateWindow(width, height, windowTitle, NULL, NULL);
 	if (window == NULL) {
 		fprintf(stderr, "Failed to open GLFW Window.\nIf you have an Intel GPU, you can't play No Man's Sky, though why would you want to?.\nAlso, you should use v2.1 instead.\n");
 		glfwTerminate();
@@ -116,6 +117,7 @@ int main(int argc, char *argv[]) {
 	float theta;
 	vec3 vecForward(0, 0, 1);
 	vec3 euler;*/
+	//bool fullscreen = false;
 	do {
 		//pastTime = chrono::steady_clock::now();
 		//Parse through glove input
@@ -211,6 +213,18 @@ int main(int argc, char *argv[]) {
 			}
 			this_thread::sleep_for(chrono::milliseconds(500));
 		}
+		/*if (glfwGetKey(window, GLFW_KEY_F11) == GLFW_PRESS) {
+			this_thread::sleep_for(chrono::milliseconds(500));
+			fullscreen = !fullscreen;
+			const GLFWvidmode* vidmode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+			glfwSetWindowMonitor(window, //Window
+				fullscreen ? glfwGetPrimaryMonitor() : nullptr, //Fullscreen if currently windowed, windowed if currently fullscreen
+				0, 0, //Origin
+				vidmode->width, vidmode->height, //Height and Width
+				GLFW_DONT_CARE //Refresh Rate
+			);
+			//glViewport(0, 0, vidmode->width, vidmode->height);
+		}*/
 	} while (SPO->isOpen() && glfwGetKey(window, GLFW_KEY_ESCAPE) != GLFW_PRESS &&
 		glfwWindowShouldClose(window) == 0);
 	if (!SPO->isOpen())

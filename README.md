@@ -18,5 +18,7 @@ To Do:
 - [x] Removing comments
 - [x] Full Rewrite
 - [ ] Add GUI
-- [ ] Add 3D graphics and data visualizer using some sort of graphics API or engine (OpenGL, Direct3D, Irrlicht, etc.)
-    - [ ] Convert all calls to MathFu to GLM(?)
+- [x] Add 3D graphics and data visualizer using some sort of graphics API or engine (OpenGL, Direct3D, Irrlicht, etc.)
+    - [x] Convert all calls to MathFu to GLM
+- [ ] Rewrite
+    - [ ] Replace OpenGL for Irrlicht for productivity?

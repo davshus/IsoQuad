@@ -1,3 +1,7 @@
+#NOTE: ALL CURRENT WORK IS BEING DONE ON THE "opengl" BRANCH OR ONE OF ITS SUB-BRANCHES.
+<br>
+<br>
+<br>
 # IsoQuad
 A remote control for a quadcopter, written in C++ by David Shustin, 2016
 <br>

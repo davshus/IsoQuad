@@ -13,6 +13,8 @@
 #include "glm/gtx/transform.hpp"
 #include "glm/gtc/quaternion.hpp"
 #include "glm/gtx/quaternion.hpp"
+#include "glm/gtx/vector_angle.hpp"
+#include "axes.h"
 using namespace std;
 using namespace glm;
 extern int width;
@@ -140,6 +142,11 @@ GLuint LoadShaders(const char * vertex_file_path, const char * fragment_file_pat
 	glDeleteShader(FragmentShaderID);
 
 	return ProgramID;
+}
+float relRoll(axes world, axes object) {
+	vec3 crss = normalize(object.up.y < 0 ? cross(object.forward, world.up) : cross(world.up, object.forward));
+	cout << "(" << crss.x << ", " << crss.y << ", " << crss.z << "), (" << object.right.x << ", " << object.right.y << ", " << object.right.z << ")\t";
+	return degrees(orientedAngle(crss, object.right, object.forward));
 }
 //Callbacks
 void resize(GLFWwindow *window, int WIDTH, int HEIGHT) {

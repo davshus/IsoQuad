@@ -1,5 +1,7 @@
 #pragma warning(disable:4996)
+//YES, I KNOW THAT MY COORDINATE SYSTEM IS A MONSTROSITY. I STARTED THIS WITHOUT KNOWING ANYTHING ABOUT WHAT TO DO AND NOW I'M TOO SCARED TO CHANGE IT UNTIL A REWRITE. PLEASE DON'T KILL ME.
 #include "funcs.h"
+#include "axes.h"
 int width = 1920;
 int height = 1080;
 float baseScale = 2.0f;
@@ -106,6 +108,7 @@ int main(int argc, char *argv[]) {
 	quat mpu;
 	quat ogl;
 	quat ogli;
+	quat oglf;
 	//quat qa;
 	quat quatIdentity;
 	//chrono::time_point<chrono::steady_clock> pastTime;
@@ -120,6 +123,13 @@ int main(int argc, char *argv[]) {
 	vec3 vecForward(0, 0, 1);
 	vec3 euler;*/
 	//bool fullscreen = false;
+	const vec3 up = vec3(0, 1, 0);
+	const vec3 down = vec3(0, -1, 0);
+	const vec3 right = vec3(1, 0, 0);
+	const vec3 left = vec3(-1, 0, 0);
+	const vec3 back = vec3(0, 0, 1);
+	const vec3 forward = vec3(0, 0, -1);
+	axes reference, object;
 	do {
 		//pastTime = chrono::steady_clock::now();
 		//Parse through glove input
@@ -175,7 +185,11 @@ int main(int argc, char *argv[]) {
 		ogl = normalize(ogl);
 		if (glfwGetKey(window, GLFW_KEY_F9) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
 			ogli = inverse(ogl);
-		Model = toMat4(normalize(ogli * ogl)) * Scale;
+		oglf = normalize(ogli * ogl);
+		object.calculate(oglf);
+		reference.calculate(inverse(ogli));
+		cout << relRoll(reference, object) << '\r';
+		Model = toMat4(oglf) * Scale;
 		MVP = Projection * View * Model;
 		glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);
 		glEnableVertexAttribArray(0);

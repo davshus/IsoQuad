@@ -1,7 +1,6 @@
-﻿cl : Command line warning D9028: minimal rebuild failure, reverting to normal build
-  main.cpp
-c:\users\david shustin\desktop\projects\isoquad\isoquad\main.cpp(170): warning C4305: '=': truncation from 'double' to 'float'
-c:\users\david shustin\desktop\projects\isoquad\isoquad\main.cpp(171): warning C4305: '=': truncation from 'double' to 'float'
-c:\users\david shustin\desktop\projects\isoquad\isoquad\main.cpp(97): warning C4101: 'key': unreferenced local variable
+﻿  main.cpp
+c:\users\david shustin\desktop\projects\isoquad\isoquad\main.cpp(180): warning C4305: '=': truncation from 'double' to 'float'
+c:\users\david shustin\desktop\projects\isoquad\isoquad\main.cpp(181): warning C4305: '=': truncation from 'double' to 'float'
+c:\users\david shustin\desktop\projects\isoquad\isoquad\main.cpp(99): warning C4101: 'key': unreferenced local variable
   isoquad.vcxproj -> C:\Users\David Shustin\Desktop\Projects\IsoQuad\Debug\isoquad.exe
   isoquad.vcxproj -> C:\Users\David Shustin\Desktop\Projects\IsoQuad\Debug\isoquad.pdb (Partial PDB)

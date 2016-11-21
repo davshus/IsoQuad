@@ -144,9 +144,9 @@ GLuint LoadShaders(const char * vertex_file_path, const char * fragment_file_pat
 	return ProgramID;
 }
 float relRoll(axes world, axes object) {
-	vec3 crss = normalize(object.up.y < 0 ? cross(object.forward, world.up) : cross(world.up, object.forward));
-	cout << "(" << crss.x << ", " << crss.y << ", " << crss.z << "), (" << object.right.x << ", " << object.right.y << ", " << object.right.z << ")\t";
-	return degrees(orientedAngle(crss, object.right, object.forward));
+	vec3 crss = normalize(cross(object.forward, world.up));
+	cout << "(" << crss.x << "\t" << crss.y << "\t" << crss.z << ")\t(" << object.up.x << "\t" << object.up.y << "\t" << object.up.z << ")\t";
+	return degrees(orientedAngleO(crss, object.right, object.forward));
 }
 //Callbacks
 void resize(GLFWwindow *window, int WIDTH, int HEIGHT) {

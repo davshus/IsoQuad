@@ -187,7 +187,7 @@ int main(int argc, char *argv[]) {
 			ogli = inverse(ogl);
 		oglf = normalize(ogli * ogl);
 		object.calculate(oglf);
-		reference.calculate(inverse(ogli));
+		reference.calculate(quat());
 		cout << relRoll(reference, object) << '\r';
 		Model = toMat4(oglf) * Scale;
 		MVP = Projection * View * Model;

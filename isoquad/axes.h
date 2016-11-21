@@ -11,10 +11,10 @@ class axes {
 		void calculate(quat);
 };
 void axes::calculate(quat q) {
-	this->up = q * vec3(0, 1, 0);
-	this->down = q * vec3(0, -1, 0);
-	this->right = q * vec3(1, 0, 0);
-	this->left = q * vec3(-1, 0, 0);
-	this->back = q * vec3(0, 0, 1);
-	this->forward = q * vec3(0, 0, -1);
+	this->up = normalize(q * vec3(0, 1, 0));
+	this->down = normalize(q * vec3(0, -1, 0));
+	this->right = normalize(q * vec3(1, 0, 0));
+	this->left = normalize(q * vec3(-1, 0, 0));
+	this->back = normalize(q * vec3(0, 0, 1));
+	this->forward = normalize(q * vec3(0, 0, -1));
 }

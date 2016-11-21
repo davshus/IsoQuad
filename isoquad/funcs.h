@@ -145,9 +145,10 @@ GLuint LoadShaders(const char * vertex_file_path, const char * fragment_file_pat
 	return ProgramID;
 }
 float relRoll(axes world, axes object) {
-	vec3 crss = normalize(cross(object.forward, world.up));
+	//change this 1 ------------------------------------------------------------------> <--------- to -1?
+	vec3 crss = normalize((rotation(vec3(object.forward.x, 0, object.forward.z), vec3(1, 0, 0)) * object.forward).z > 0 ? cross(object.forward, world.up) : cross(world.up, object.forward)); //If object.forward is behind world.up, do the opposite cross
 	cout << "(" << crss.x << "\t" << crss.y << "\t" << crss.z << ")\t(" << object.up.x << "\t" << object.up.y << "\t" << object.up.z << ")\t";
-	return degrees(orientedAngle(crss, object.right, object.forward));
+	return 180+degrees(orientedAngle(crss, object.right, object.forward));
 }
 //Callbacks
 void resize(GLFWwindow *window, int WIDTH, int HEIGHT) {

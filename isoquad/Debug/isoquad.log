@@ -2,11 +2,7 @@
 c:\users\david shustin\desktop\projects\isoquad\isoquad\main.cpp(180): warning C4305: '=': truncation from 'double' to 'float'
 c:\users\david shustin\desktop\projects\isoquad\isoquad\main.cpp(181): warning C4305: '=': truncation from 'double' to 'float'
 c:\users\david shustin\desktop\projects\isoquad\isoquad\main.cpp(99): warning C4101: 'key': unreferenced local variable
-c:\users\david shustin\desktop\projects\isoquad\glm\glm\gtx\vector_angle.inl(69): warning C4244: 'return': conversion from 'int' to 'float', possible loss of data
-  c:\users\david shustin\desktop\projects\isoquad\isoquad\funcs.h(149): note: see reference to function template instantiation 'T glm::orientedAngleO<float,0>(const glm::tvec3<T,0> &,const glm::tvec3<T,0> &,const glm::tvec3<T,0> &)' being compiled
-          with
-          [
-              T=float
-          ]
+  LINK : C:\Users\David Shustin\Desktop\Projects\IsoQuad\Debug\isoquad.exe not found or not built by the last incremental link; performing full link
+LINK : warning LNK4098: defaultlib 'MSVCRT' conflicts with use of other libs; use /NODEFAULTLIB:library
   isoquad.vcxproj -> C:\Users\David Shustin\Desktop\Projects\IsoQuad\Debug\isoquad.exe
   isoquad.vcxproj -> C:\Users\David Shustin\Desktop\Projects\IsoQuad\Debug\isoquad.pdb (Partial PDB)

@@ -9,6 +9,7 @@
 #include <fstream>
 #include <thread>
 #include "serial.h"
+#define GLM_ENABLE_EXPERIMENTAL
 #include "glm/glm.hpp"
 #include "glm/gtx/transform.hpp"
 #include "glm/gtc/quaternion.hpp"
@@ -146,7 +147,7 @@ GLuint LoadShaders(const char * vertex_file_path, const char * fragment_file_pat
 float relRoll(axes world, axes object) {
 	vec3 crss = normalize(cross(object.forward, world.up));
 	cout << "(" << crss.x << "\t" << crss.y << "\t" << crss.z << ")\t(" << object.up.x << "\t" << object.up.y << "\t" << object.up.z << ")\t";
-	return degrees(orientedAngleO(crss, object.right, object.forward));
+	return degrees(orientedAngle(crss, object.right, object.forward));
 }
 //Callbacks
 void resize(GLFWwindow *window, int WIDTH, int HEIGHT) {

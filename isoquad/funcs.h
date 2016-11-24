@@ -144,6 +144,7 @@ GLuint LoadShaders(const char * vertex_file_path, const char * fragment_file_pat
 
 	return ProgramID;
 }
+//Why does the cross product give weird results when the vectors are close together?
 float relRoll(axes world, axes object) {
 	//Will return 0 if the ground is out of range when proximity is implemented.
 	//vec3 crss = normalize((rotation(vec3(object.forward.x, 0, object.forward.z), vec3(-1, 0, 0)) * object.forward).z > 0 ? cross(object.forward, world.up) : cross(world.up, object.forward)); //If object.forward is behind world.up, do the opposite cross

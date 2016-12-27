@@ -1,0 +1,2 @@
+isoquad: axes.h funcs.h main.cpp
+	g++ -std=c++11 -o isoquad main.cpp -I. -I glm -lserial -lGLEW -lGLU -lGL -lm -lglfw3 -lX11 -lXrandr -lXinerama -lXi -lXxf86vm -lXcursor -lGL -lpthread -ldl -Wl,-rpath=/usr/lib64/

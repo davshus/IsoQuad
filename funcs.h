@@ -41,7 +41,7 @@ serial::Serial* connect(char *cport, const char *cbaud = "115200") {
 		throw out_of_range("Baud rate is a negative number.");
 	}
 	try {
-		serial::Serial *thisSerial = new serial::Serial(port, baud, serial::Timeout(1000));
+		serial::Serial *thisSerial = new serial::Serial(port, baud, serial::Timeout::simpleTimeout(1000));
 		return thisSerial;
 	}
 	catch (const exception& e) {

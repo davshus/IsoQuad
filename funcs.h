@@ -46,7 +46,7 @@ serial::Serial* connect(char *cport, const char *cbaud = "115200") {
 	}
 	catch (const exception& e) {
 		printf("There was a problem creating a Serial connection.\n");
-		throw e; //what the hell is this --> exception(e.what());
+		throw runtime_error(e.what());
 	}
 }
 GLuint LoadShaders(const char * vertex_file_path, const char * fragment_file_path) {

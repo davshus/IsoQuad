@@ -8,6 +8,11 @@ int height = 1080;
 float baseScale = 2.0f;
 mat4 Scale = scale(vec3(baseScale));
 mat4 Projection;
+#ifdef __linux__
+const char eol = '\n';
+#else
+const char eol = '\r';
+#endif
 void printArgUsage(char* arg0) {
 	printf("Incorrect argument usage!\n Correct usage: %s <port> <baud rate>\n", arg0);
 }
@@ -189,7 +194,7 @@ int main(int argc, char *argv[]) {
 		oglf = normalize(ogli * ogl);
 		object.calculate(oglf);
 		reference.calculate(quat());
-		cout << relRoll(reference, object) << '\r';
+		cout << relRoll(reference, object) << eol;
 		Model = toMat4(oglf) * Scale;
 		MVP = Projection * View * Model;
 		glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);

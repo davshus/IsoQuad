@@ -108,7 +108,7 @@ int main(int argc, char *argv[]) {
 	SPO ->write("l"); //begin transmission
 	int synced = 0;
 	int serialCount = 0;
-	unsigned char teapotPacket[14];
+	unsigned char teapotPacket[16];
 	//short teapotShort[8];
 	//float q[4] = { 1.0f, 0.0f, 0.0f, 0.0f };
 	quat mpu;
@@ -117,6 +117,7 @@ int main(int argc, char *argv[]) {
 	quat oglf;
 	//quat qa;
 	quat quatIdentity;
+	uint16_t prox;
 	//chrono::time_point<chrono::steady_clock> pastTime;
 	//chrono::milliseconds deltaTime;
 	chrono::time_point<chrono::steady_clock> atSerial = chrono::steady_clock::now();
@@ -147,20 +148,21 @@ int main(int argc, char *argv[]) {
 				if (synced == 0 && ch != '$') continue;
 				synced = 1;
 				if ((serialCount == 1 && ch != 0x02)
-					|| (serialCount == 12 && ch != '\r')
-					|| (serialCount == 13 && ch != '\n')) {
+					|| (serialCount == 14 && ch != '\r')
+					|| (serialCount == 15 && ch != '\n')) {
 					serialCount = 0;
 					synced = 0;
 					continue;
 				}
 				if (serialCount > 0 || ch == '$') {
 					teapotPacket[serialCount++] = (unsigned char)ch;
-					if (serialCount == 14) {
+					if (serialCount == 16) {
 						serialCount = 0;
 						mpu.w = ((teapotPacket[2] << 8) | teapotPacket[3]) / 16384.0f;
 						mpu.x = ((teapotPacket[4] << 8) | teapotPacket[5]) / 16384.0f;
 						mpu.y = ((teapotPacket[6] << 8) | teapotPacket[7]) / 16384.0f;
 						mpu.z = ((teapotPacket[8] << 8) | teapotPacket[9]) / 16384.0f;
+						prox = ((teapotPacket[11] << 8) | teapotPacket[12]);
 						for (int i = 0; i < 4; i++) if (mpu[i] >= 2) mpu[i] = -4 + mpu[i];
 
 					}
@@ -194,7 +196,7 @@ int main(int argc, char *argv[]) {
 		oglf = normalize(ogli * ogl);
 		object.calculate(oglf);
 		reference.calculate(quat());
-		cout << relRoll(reference, object) << eol;
+		cout << relRoll(reference, object) << ' ' << prox << eol;
 		Model = toMat4(oglf) * Scale;
 		MVP = Projection * View * Model;
 		glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);

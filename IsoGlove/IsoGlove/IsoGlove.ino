@@ -29,7 +29,7 @@ uint8_t fifoBuffer[64]; // FIFO storage buffer
 //float ypr[3];           // [yaw, pitch, roll]   yaw/pitch/roll container and gravity vector
 
 // packet structure for InvenSense teapot demo
-uint8_t teapotPacket[14] = { '$', 0x02, 0,0, 0,0, 0,0, 0,0, 0x00, 0x00, '\r', '\n' };
+uint8_t teapotPacket[16] = { '$', 0x02, 0,0, 0,0, 0,0, 0,0, 0x00, 0, 0, 0x00, '\r', '\n' };
 
 volatile bool mpuInterrupt = false;     // indicates whether MPU interrupt pin has gone high
 void dmpDataReady() {
@@ -39,7 +39,7 @@ void dmpDataReady() {
 const int trigPin = 13;
 const int echoPin = 12;
 
-long durration;
+long duration;
 int distance;
 
 void setup() {
@@ -128,8 +128,8 @@ void loop() {
     delayMicroseconds(10);
     digitalWrite(trigPin, LOW);
 
-    durration = pulseIn(echoPin, HIGH);
-    distance = durration * 0.034/2;
+    duration = pulseIn(echoPin, HIGH);
+    distance = duration * 0.034/2;
 
   
 
@@ -175,8 +175,10 @@ void loop() {
             teapotPacket[7] = fifoBuffer[9];
             teapotPacket[8] = fifoBuffer[12];
             teapotPacket[9] = fifoBuffer[13];
-            Serial.write(teapotPacket, 14);
-            teapotPacket[11]++; // packetCount, loops at 0xFF on purpose
+            teapotPacket[11] = (uint8_t)(distance >> 8);
+            teapotPacket[12] = (uint8_t)(distance & 0xFF);
+            Serial.write(teapotPacket, 16);
+            teapotPacket[13]++; // packetCount, loops at 0xFF on purpose
         #endif
 
         // blink LED to indicate activity

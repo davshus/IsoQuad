@@ -114,10 +114,11 @@ int main(int argc, char *argv[]) {
 	quat mpu;
 	quat ogl;
 	quat ogli;
+	int proxi = 0;
 	quat oglf;
 	//quat qa;
 	quat quatIdentity;
-	uint16_t prox;
+	int prox = 0;
 	//chrono::time_point<chrono::steady_clock> pastTime;
 	//chrono::milliseconds deltaTime;
 	chrono::time_point<chrono::steady_clock> atSerial = chrono::steady_clock::now();
@@ -191,12 +192,15 @@ int main(int argc, char *argv[]) {
 			ogl.z = 0;
 		}
 		ogl = normalize(ogl);
-		if (glfwGetKey(window, GLFW_KEY_F9) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
+		if (glfwGetKey(window, GLFW_KEY_F9) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
 			ogli = inverse(ogl);
+			proxi = -prox;
+		}
 		oglf = normalize(ogli * ogl);
 		object.calculate(oglf);
 		reference.calculate(quat());
-		cout << relRoll(reference, object) << ' ' << prox << eol;
+		cout << relRoll(reference, object) << ' ' << (prox + proxi) << ' ' << sgn(prox + proxi) << eol;
+		Scale = scale(vec3(baseScale * (pow(abs(prox + proxi), sgn(prox + proxi)))));
 		Model = toMat4(oglf) * Scale;
 		MVP = Projection * View * Model;
 		glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);

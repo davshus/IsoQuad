@@ -23,6 +23,11 @@ extern int height;
 extern mat4 Projection;
 extern mat4 Scale;
 extern float baseScale;
+//Credit to user79758 on Stack Overflow (http://stackoverflow.com/questions/1903954/is-there-a-standard-sign-function-signum-sgn-in-c-c) for this function
+template <typename T>
+int sgn(T val) {
+    return (T(0) < val) - (val < T(0));
+}
 serial::Serial* connect(char *cport, const char *cbaud = "115200") {
 	string port(cport);
 	string sbaud(cbaud);
